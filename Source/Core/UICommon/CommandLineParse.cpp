@@ -94,6 +94,10 @@ std::unique_ptr<optparse::OptionParser> CreateParser(ParserOptions options)
       .metavar("<System>.<Section>.<Key>=<Value>")
       .type("string")
       .help("Set a configuration option");
+  
+  parser->add_option("-ipl0", "--gcbios_u").action("store_true").help("Launches USA GC Bios if available");
+  parser->add_option("-ipl1", "--gcbios_p").action("store_true").help("Launches EUR GC Bios if available");
+  parser->add_option("-ipl2", "--gcbios_j").action("store_true").help("Launches JAP GC Bios if available");
 
   if (options == ParserOptions::IncludeGUIOptions)
   {
