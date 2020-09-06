@@ -34,6 +34,8 @@
 #include "UICommon/CommandLineParse.h"
 #include "UICommon/UICommon.h"
 
+#include "MainWindow.h"
+
 static bool QtMsgAlertHandler(const char* caption, const char* text, bool yes_no,
                               Common::MsgType style)
 {
@@ -153,6 +155,21 @@ int main(int argc, char* argv[])
 
   std::unique_ptr<BootParameters> boot;
   bool game_specified = false;
+  if (options.is_set("gcbios_u"))
+  {
+    boot = std::make_unique<BootParameters>(BootParameters::IPL({DiscIO::Region::NTSC_U}));
+    game_specified = true;
+  }
+  if (options.is_set("gcbios_p"))
+  {
+    boot = std::make_unique<BootParameters>(BootParameters::IPL({DiscIO::Region::PAL}));
+    game_specified = true;
+  }
+  if (options.is_set("gcbios_j"))
+  {
+    boot = std::make_unique<BootParameters>(BootParameters::IPL({DiscIO::Region::NTSC_J}));
+    game_specified = true;
+  }
   if (options.is_set("exec"))
   {
     const std::list<std::string> paths_list = options.all("exec");
