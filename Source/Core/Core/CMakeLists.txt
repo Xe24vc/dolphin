@@ -462,6 +462,8 @@ add_library(core
   PowerPC/Interpreter/Interpreter_Paired.cpp
   PowerPC/Interpreter/Interpreter_SystemRegisters.cpp
   PowerPC/Interpreter/Interpreter_Tables.cpp
+	Parameters.cpp
+	Parameters.h
 )
 
 if(_M_X86)
