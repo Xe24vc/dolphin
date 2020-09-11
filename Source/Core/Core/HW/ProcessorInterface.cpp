@@ -17,6 +17,9 @@
 #include "Core/IOS/STM/STM.h"
 #include "Core/PowerPC/PowerPC.h"
 
+#include "Core/Config/GraphicsSettings.h"
+#include "Core/Parameters.h"
+
 namespace ProcessorInterface
 {
 // STATE_TO_SAVE
@@ -84,6 +87,10 @@ void Init()
       CoreTiming::RegisterEvent("IOSNotifyPowerButton", IOSNotifyPowerButtonCallback);
 }
 
+using namespace Parameters;
+auto IO = Parameters::Get();
+bool Active = false;
+
 void RegisterMMIO(MMIO::Mapping* mmio, u32 base)
 {
   mmio->Register(base | PI_INTERRUPT_CAUSE, MMIO::DirectRead<u32>(&m_InterruptCause),
@@ -109,7 +116,19 @@ void RegisterMMIO(MMIO::Mapping* mmio, u32 base)
 
   mmio->Register(base | PI_FIFO_RESET, MMIO::InvalidRead<u32>(),
                  MMIO::ComplexWrite<u32>(
-                     [](u32, u32 val) { WARN_LOG(PROCESSORINTERFACE, "Fifo reset (%08x)", val); }));
+                     [](u32, u32 val)
+                       {
+                         WARN_LOG(PROCESSORINTERFACE, "Fifo reset (%08x)", val);
+                         
+                         if (IO.ImmediateXFB() == true && Active == false)
+                         {
+                           Config::SetCurrent(Config::GFX_HACK_IMMEDIATE_XFB,
+                             !Config::Get(Config::GFX_HACK_IMMEDIATE_XFB));
+                            
+                          NOTICE_LOG(COMMON, "ImmediateXFB enabled.");
+                          Active = true;
+                         }
+                       }));
 
   mmio->Register(base | PI_RESET_CODE, MMIO::DirectRead<u32>(&m_ResetCode),
                  MMIO::DirectWrite<u32>(&m_ResetCode));
