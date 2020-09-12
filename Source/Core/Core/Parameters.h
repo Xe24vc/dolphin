@@ -8,7 +8,7 @@ namespace Parameters
 
 namespace Set
   {
-    void ImmediateXFB(int value);
+    void GameIni(std::vector<std::string> game);
   }
   
 class Get
