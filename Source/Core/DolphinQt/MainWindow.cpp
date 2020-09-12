@@ -113,12 +113,7 @@
 #include "VideoCommon/NetPlayChatUI.h"
 #include "VideoCommon/VideoConfig.h"
 
-#include "Core/BootManager.h"
-#include "Core/ConfigManager.h"
 #include "Core/Parameters.h"
-#include "Common/IniFile.h"
-#include <iostream>
-#include <fstream>
 
 #if defined(HAVE_XRANDR) && HAVE_XRANDR
 #include "UICommon/X11Utils.h"
@@ -696,34 +691,7 @@ void MainWindow::ChangeDisc()
   if (!paths.empty())
     Core::RunAsCPUThread([&paths] { DVDInterface::ChangeDisc(paths); });
   
-  SConfig& StartUp = SConfig::GetInstance();
-  
-  std::string game_id;
-  std::optional<u16> revision;
-  bool ImmediateXFB = false;
-  
-  using std::ifstream;
-  const char *file = (paths.front().c_str());
-  ifstream infile(file, ifstream::in);
-  infile >> std::hex >> game_id;
-  revision = 0;
-  
-  IniFile game_ini = StartUp.LoadGameIni(game_id.c_str(), revision);
-  
-  IniFile::Section* core_section = game_ini.GetOrCreateSection("Core");
-  IniFile::Section* dsp_section = game_ini.GetOrCreateSection("DSP");
-  IniFile::Section* controls_section = game_ini.GetOrCreateSection("Controls");
-  IniFile::Section* video_hacks_section = game_ini.GetOrCreateSection("Video_Hacks");
-  
-  core_section->Get("Overclock", &StartUp.m_OCFactor, StartUp.m_OCFactor);
-  core_section->Get("OverclockEnable", &StartUp.m_OCEnable, StartUp.m_OCEnable);
-  video_hacks_section->Get("ImmediateXFBenable", &ImmediateXFB, ImmediateXFB);
-  
-  if (ImmediateXFB == true)
-  {
-    Parameters::Set::ImmediateXFB(1);
-  }
-  
+  Parameters::Set::GameIni(paths);
   NOTICE_LOG(COMMON, "Applied Ini on Bios.");
 }
 
