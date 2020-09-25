@@ -14,6 +14,7 @@ namespace Set
 class Get
   {
     public:
+    bool DeferEFB();
     bool ImmediateXFB();
   };
 }
