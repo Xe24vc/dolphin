@@ -88,7 +88,7 @@ void Init()
 }
 
 using namespace Parameters;
-auto IO = Parameters::Get();
+auto Ini = Parameters::Get();
 bool Active = false;
 
 void RegisterMMIO(MMIO::Mapping* mmio, u32 base)
@@ -120,14 +120,23 @@ void RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                        {
                          WARN_LOG(PROCESSORINTERFACE, "Fifo reset (%08x)", val);
                          
-                         if (IO.ImmediateXFB() == true && Active == false)
+                         if (Ini.DeferEFB() == true && Active == false)
+                         {
+                           Config::SetCurrent(Config::GFX_HACK_DEFER_EFB_COPIES,
+                             !Config::Get(Config::GFX_HACK_DEFER_EFB_COPIES));
+                            
+                           NOTICE_LOG(COMMON, "DeferEFB enabled.");
+                         }
+                         
+                         if (Ini.ImmediateXFB() == true && Active == false)
                          {
                            Config::SetCurrent(Config::GFX_HACK_IMMEDIATE_XFB,
                              !Config::Get(Config::GFX_HACK_IMMEDIATE_XFB));
                             
-                          NOTICE_LOG(COMMON, "ImmediateXFB enabled.");
-                          Active = true;
+                           NOTICE_LOG(COMMON, "ImmediateXFB enabled.");
                          }
+                         
+                         Active = true;
                        }));
 
   mmio->Register(base | PI_RESET_CODE, MMIO::DirectRead<u32>(&m_ResetCode),
